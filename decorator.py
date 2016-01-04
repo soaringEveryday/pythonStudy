@@ -30,13 +30,14 @@ def multi_log(f):
 
 
 @multi_log
-def factorial(n, x):
-    return reduce(lambda x, y: x * y, range(1, n + 1, x))
+def factorial(n, s):
+    return reduce(lambda x, y: x * y, range(1, n + 1, s))
 
 
 print factorial(10, 2)
 
 
+# 一个测量耗时的decorator
 def performance(f):
     def fn(*args, **kw):
         start = time.time()
@@ -44,11 +45,41 @@ def performance(f):
         end = time.time()
         print 'call %s() in %fs' % (f.__name__, (end - start))
         return r
+
     return fn
 
 
 @performance
 def factorial(n):
-    return reduce(lambda x,y: x*y, range(1, n+1))
+    return reduce(lambda x, y: x * y, range(1, n + 1))
+
+
+print factorial(10)
+
+
+# 带有参数的decorator
+
+def performance(arg):
+    def performance_decorator(f):
+        def fn(*args, **kw):
+            start = time.time()
+            r = f(*args, **kw)
+            end = time.time()
+            if arg == 's':
+                print 'call %s() in %fs' % (f.__name__, (end - start))
+            elif arg == 'ms':
+                print 'call %s() in %fms' % (f.__name__, (end * 1000 - start * 1000))
+
+            return r
+
+        return fn
+
+    return performance_decorator
+
+
+@performance('ms')
+def factorial(n):
+    return reduce(lambda x, y: x * y, range(1, n + 1))
+
 
 print factorial(10)
